@@ -1,0 +1,36 @@
+name: Daily Competitor Radar Crawler
+
+on:
+  schedule:
+    # 每天北京时间 14:00 (UTC 时间 06:00) 运行
+    - cron: '0 6 * * *'
+  workflow_dispatch: # 允许手动触发
+
+jobs:
+  crawl-and-notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip' # 缓存 pip 依赖
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install playwright requests sqlalchemy
+          playwright install chromium
+
+      - name: Run Crawler and Send to Feishu
+        env:
+          FEISHU_WEBHOOK_URL: ${{ secrets.FEISHU_WEBHOOK_URL }}
+        run: |
+          cd backend
+          python github_actions_runner.py
