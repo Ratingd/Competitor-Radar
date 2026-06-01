@@ -21,14 +21,14 @@ jobs:
           cache: 'pip' # 缓存 pip 依赖
 
       - name: Install dependencies
-        run: 
+        run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install playwright requests sqlalchemy
-          playwright install chromium
+          playwright install --with-deps chromium
 
       - name: Run Crawler and Send to Feishu
         env:
           FEISHU_WEBHOOK_URL: ${{ secrets.FEISHU_WEBHOOK_URL }}
-        run: 
+        run: |
           python github_actions_runner.py
