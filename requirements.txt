@@ -1,0 +1,16 @@
+fastapi
+uvicorn
+sqlalchemy
+pydantic>=2.0.0
+pydantic-settings>=2.0.0
+playwright
+openai
+apscheduler
+python-dotenv
+requests
+beautifulsoup4
+lxml
+pyyaml>=6.0.1
+pandas
+openpyxl
+python-docx
