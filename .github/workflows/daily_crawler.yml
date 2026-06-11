@@ -2,8 +2,8 @@ name: Daily Competitor Radar Crawler
 
 on:
   schedule:
-    # 每天北京时间 14:00 (UTC 时间 06:00) 运行
-    - cron: '0 6 * * *'
+    # 每天北京时间 12:00 (UTC 时间 04:00) 运行
+    - cron: '0 4 * * *'
   workflow_dispatch: # 允许手动触发
 
 jobs:
