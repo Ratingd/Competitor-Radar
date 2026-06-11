@@ -29,7 +29,8 @@ def analyze_bidding(title: str, content: str, matched_competitors: list = None) 
     "supplier": "供应商名称 (直接填入匹配上的竞对名称：{competitors_str})",
     "qualifications": "中标供应商情况 (中标供应商全称，以及其资质/实力等关键信息)",
     "summary": "项目简报 (一句话概括项目内容、金额及中标方)",
-    "opportunity_analysis": "竞对分析 (分析本次中标的竞对公司【{competitors_str}】为何能中标，其可能提供的服务方案或核心优势，以及该中标动态所反映出的行业趋势和防范建议)"
+    "opportunity_analysis": "竞对分析 (分析本次中标的竞对公司【{competitors_str}】为何能中标，其可能提供的服务方案或核心优势，以及该中标动态所反映出的行业趋势和防范建议)",
+    "is_agency_only": "布尔值true或false (如果正文中提到的所有竞对公司仅仅是作为'招标代理机构'、'采购代理机构'等非中标/候选供应商身份出现，则为true；如果至少有一家竞对公司是作为中标候选人、中标人、供应商等身份出现，则为false)"
 }}
 
 【输出要求】
@@ -59,11 +60,13 @@ def analyze_bidding(title: str, content: str, matched_competitors: list = None) 
         result = json.loads(result_content)
         
         # 确保所有必要字段存在
-        required_fields = ["category", "budget", "deadline", "supplier", "qualifications", "summary", "opportunity_analysis"]
+        required_fields = ["category", "budget", "deadline", "supplier", "qualifications", "summary", "opportunity_analysis", "is_agency_only"]
         for field in required_fields:
             if field not in result:
                 if field == "supplier":
                     result[field] = competitors_str
+                elif field == "is_agency_only":
+                    result[field] = False
                 else:
                     result[field] = "未知"
         
@@ -78,5 +81,6 @@ def analyze_bidding(title: str, content: str, matched_competitors: list = None) 
             "deadline": "未知",
             "supplier": competitors_str,
             "qualifications": "未知",
-            "opportunity_analysis": "分析失败，请人工查看"
+            "opportunity_analysis": "分析失败，请人工查看",
+            "is_agency_only": False
         }

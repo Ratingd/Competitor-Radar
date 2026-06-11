@@ -26,10 +26,25 @@ def send_to_feishu(webhook_url: str, biddings: list):
         # Given Feishu limits, we shouldn't send too much. Let's send a card summarizing the findings.
         elements = []
         for i, b in enumerate(biddings[:10], 1):  # Limit to 10 to avoid too large payload
+            supplier_name = "未知"
+            if b.meta_info and isinstance(b.meta_info, dict):
+                if b.meta_info.get('supplier') and b.meta_info.get('supplier') != '未知':
+                    supplier_name = b.meta_info.get('supplier')
+
+            content_str = (
+                f"**{i}. {b.title}**\n"
+                f"**中标竞对**: {supplier_name}\n"
+                f"来源: {b.source_website} | 类型: {b.notice_type}\n"
+                f"发布日期: {b.publish_date.strftime('%Y-%m-%d') if b.publish_date else '未知'}\n\n"
+                f"**【项目简报】**\n{b.content_abstract or '暂无'}\n\n"
+                f"**【竞对分析】**\n{b.opportunity_analysis or '暂无'}\n\n"
+                f"[🔗 点击查看原文]({b.source_url})"
+            )
+
             elements.append({
                 "tag": "div",
                 "text": {
-                    "content": f"**{i}. {b.title}**\n来源: {b.source_website} | 类型: {b.notice_type}\n发布日期: {b.publish_date.strftime('%Y-%m-%d') if b.publish_date else '未知'}\n[查看原文]({b.source_url})",
+                    "content": content_str,
                     "tag": "lark_md"
                 }
             })

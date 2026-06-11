@@ -79,7 +79,7 @@ def print(*args, **kwargs):
 
 
 # 默认关键词（当未传入关键词时使用）
-DEFAULT_KEYWORDS = ["智算", "算力网络", "核心网", "业务网", "数据网", "承载网", "骨干网", "IP网", "医药", "移动", "5G", "服务器", "软件", "系统", "设备", "集成"]
+DEFAULT_KEYWORDS = ["广东省电信规划设计院有限公司", "华信咨询设计研究院有限公司", "广东南方电信规划咨询设计院有限公司", "中国移动通信集团设计院有限公司"]
 
 def safe_goto(page, url, timeout=60000, max_retries=3):
     """
@@ -148,6 +148,10 @@ def process_bidding(db: Session, title: str, content: str, url: str, publish_dat
         content_to_analyze = content_to_analyze[:10000]
         
     analysis = analyze_bidding(title, content_to_analyze, matched_competitors=matched_competitors)
+    
+    if analysis.get("is_agency_only") is True:
+        print(f"Skipping: 竞对仅作为招标代理机构出现 - {title}", flush=True)
+        return existing if existing else None
     
     if existing:
         existing.raw_html = content
