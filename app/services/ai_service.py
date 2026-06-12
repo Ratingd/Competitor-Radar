@@ -30,12 +30,16 @@ def analyze_bidding(title: str, content: str, matched_competitors: list = None) 
     "qualifications": "中标供应商情况 (中标供应商全称，以及其资质/实力等关键信息)",
     "summary": "项目简报 (一句话概括项目内容、金额及中标方)",
     "opportunity_analysis": "竞对分析 (分析本次中标的竞对公司【{competitors_str}】为何能中标，其可能提供的服务方案或核心优势，以及该中标动态所反映出的行业趋势和防范建议)",
-    "is_agency_only": "布尔值true或false (如果正文中提到的所有竞对公司仅仅是作为'招标代理机构'、'采购代理机构'等非中标/候选供应商身份出现，则为true；如果至少有一家竞对公司是作为中标候选人、中标人、供应商等身份出现，则为false)"
+    "is_agency_only": false 
 }}
 
 【输出要求】
 1. 仅返回 JSON 对象，不要包含 markdown 代码块标记
-2. opportunity_analysis 要具体，重点分析竞对表现和项目特点"""
+2. opportunity_analysis 要具体，重点分析竞对表现和项目特点
+3. 【极其重要】关于 is_agency_only 字段的判定规则：
+   - 如果正文中提到的所有竞对公司仅仅是作为“招标代理机构”、“采购代理机构”、“发布人”、“联系人”等非中标/非候选供应商身份出现，你必须严格输出 true。
+   - 如果至少有一家竞对公司是作为“中标候选人”、“中标人”、“供应商”、“成交人”等身份出现，你才输出 false。
+   - 注意：输出的 true 或 false 必须是原生的 JSON 布尔值，不能带引号。"""
 
     try:
         response = client.chat.completions.create(
@@ -69,6 +73,10 @@ def analyze_bidding(title: str, content: str, matched_competitors: list = None) 
                     result[field] = False
                 else:
                     result[field] = "未知"
+                    
+        # 强制类型转换，防止大模型返回字符串类型的 "true" 或 "True"
+        if isinstance(result.get("is_agency_only"), str):
+            result["is_agency_only"] = result["is_agency_only"].strip().lower() == "true"
         
         return result
         
